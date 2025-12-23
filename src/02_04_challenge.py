@@ -1,3 +1,5 @@
+# 02_05_solution.py
+
 # Import necessary libraries
 import os
 import numpy as np
@@ -75,21 +77,21 @@ def create_enhanced_plus_cnn_model():
         BatchNormalization(),
         MaxPooling2D((2, 2)),
         Dropout(0.2),
-        
+
         Conv2D(64, (3, 3), activation='relu'),
         BatchNormalization(),
         MaxPooling2D((2, 2)),
         Dropout(0.3),
-        
+
         Conv2D(128, (3, 3), activation='relu'),
         BatchNormalization(),
         MaxPooling2D((2, 2)),
         Dropout(0.4),
-        
-        # Add the new convolutional layer here
-        # TODO: Add an additional Conv2D layer with 256 filters
-        # Example: Conv2D(256, (2, 2), activation='relu'),
-        
+
+        Conv2D(256, (2, 2), activation='relu'),  # New convolutional layer
+        BatchNormalization(),
+        Dropout(0.5),
+
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
@@ -133,6 +135,12 @@ else:
     plt.ylabel('Accuracy')
     plt.ylim([0, 1])
     plt.legend(loc='lower right')
+
+    # Save the plot to a file
+    plot_file = os.path.join(plot_path, '02_05_end_enhanced_plus_model.png')
+    plt.savefig(plot_file)
+    print(f'Plot saved to {plot_file}')
+
     plt.show()  # Show the plot
     plt.close()  # Close the figure after showing it
 

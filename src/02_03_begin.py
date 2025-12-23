@@ -1,6 +1,6 @@
-# 02_03_begin.py
+# 02_03_end.py
 
-# Continue from the previous code in 02_02_begin.py
+# Continue from the previous code in 02_03_begin.py
 
 # Import necessary libraries
 import os
@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout, BatchNormalization
 
 # Disable oneDNN custom operations
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
@@ -72,15 +72,26 @@ plot_file = os.path.join(plot_path, 'display_images.png')
 # Display a sample of training images with their labels and save the plot
 display_images(X_train, labels, y_train, save_path=plot_file)
 
-# Define a simple CNN model
-def create_simple_cnn_model():
+# Define an enhanced CNN model
+def create_enhanced_cnn_model():
     model = Sequential([
         Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+        BatchNormalization(),
         MaxPooling2D((2, 2)),
+        Dropout(0.2),
+
         Conv2D(64, (3, 3), activation='relu'),
+        BatchNormalization(),
         MaxPooling2D((2, 2)),
+        Dropout(0.3),
+
+        Conv2D(128, (3, 3), activation='relu'),
+        BatchNormalization(),
+        MaxPooling2D((2, 2)),
+        Dropout(0.4),
+
         Flatten(),
-        Dense(64, activation='relu'),
+        Dense(128, activation='relu'),
         Dropout(0.5),
         Dense(10, activation='softmax')
     ])
@@ -92,7 +103,7 @@ if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 # Define the model path
-model_path = os.path.join(output_dir, 'cifar10_simple_model.h5')
+model_path = os.path.join(output_dir, 'cifar10_enhanced_model.h5')
 
 # Check if the model already exists
 if os.path.isfile(model_path):
@@ -100,8 +111,8 @@ if os.path.isfile(model_path):
     model = tf.keras.models.load_model(model_path)
     print(f"Loaded existing model from {model_path}")
 else:
-    # Create the simple CNN model
-    model = create_simple_cnn_model()
+    # Create the enhanced CNN model
+    model = create_enhanced_cnn_model()
 
     # Compile the model with Adam optimizer and categorical crossentropy loss function
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -110,7 +121,7 @@ else:
     model.summary()
 
     # Train the model on the training data
-    history = model.fit(X_train, y_train, epochs=5, batch_size=64, validation_data=(X_test, y_test))
+    history = model.fit(X_train, y_train, epochs=20, batch_size=64, validation_data=(X_test, y_test))
 
     # Save the trained model to the output directory
     model.save(model_path)
@@ -122,6 +133,12 @@ else:
     plt.ylabel('Accuracy')
     plt.ylim([0, 1])
     plt.legend(loc='lower right')
+
+    # Save the plot to a file
+    plot_file = os.path.join(plot_path, '02_03_end_enhanced_model.png')
+    plt.savefig(plot_file)
+    print(f'Plot saved to {plot_file}')
+
     plt.show()  # Show the plot
     plt.close()  # Close the figure after showing it
 
