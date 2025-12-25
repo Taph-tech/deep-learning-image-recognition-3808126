@@ -113,3 +113,106 @@ model.save(model_path)
 print(f"Model saved to {model_path}")
 
 # Challenges Discussion
+
+# 1. Dealing with Different Lighting Conditions
+# Simulate different lighting conditions by adjusting brightness and contrast using simple scaling.
+
+def adjust_brightness_contrast(image, alpha=1.0, beta=0.0):
+    return np.clip(alpha * image + beta, 0, 1)
+
+bright_image = adjust_brightness_contrast(X_train[0], alpha=1.5)
+dark_image = adjust_brightness_contrast(X_train[0], alpha=0.5)
+
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.imshow(bright_image)
+plt.title('Bright Image')
+plt.subplot(1, 2, 2)
+plt.imshow(dark_image)
+plt.title('Dark Image')
+lighting_conditions_path = os.path.join(plot_path, '03_05_lighting_conditions.png')
+plt.savefig(lighting_conditions_path)
+print(f'Lighting conditions plot saved to {lighting_conditions_path}')
+plt.show()  # Show the plot
+plt.close()  # Close the figure after showing it
+
+# 2. Handling Occlusions
+# Simulate occlusions by adding a black rectangle to the image using NumPy.
+
+def add_occlusion(image, x, y, width, height): # Function to add a black rectangle occlusion
+    occluded_image = image.copy()  # Create a copy of the original image
+    occluded_image[x:x+width, y:y+height, :] = 0 # Set the specified rectangle area to black
+    return occluded_image
+
+occluded_image = add_occlusion(X_train[0], 8, 8, 16, 16)
+
+plt.imshow(occluded_image)
+plt.title('Occluded Image')
+occlusion_path = os.path.join(plot_path, '03_05_occluded_image.png')
+plt.savefig(occlusion_path)
+print(f'Occluded image plot saved to {occlusion_path}')
+plt.show()  # Show the plot
+plt.close()  # Close the figure after showing it
+
+# 3. Scale Variations
+# Show examples of images at different scales using tf.image.
+
+def rescale_image(image, scale):
+    return tf.image.resize(image, (int(image.shape[0] * scale), int(image.shape[1] * scale)))
+
+scaled_image_1 = rescale_image(X_train[0], 0.5)
+scaled_image_2 = rescale_image(X_train[0], 1.5)
+
+plt.figure(figsize=(6, 3))
+plt.subplot(1, 2, 1)
+plt.imshow(scaled_image_1.numpy())
+plt.title('Scaled Down Image')
+plt.subplot(1, 2, 2)
+plt.imshow(scaled_image_2.numpy())
+plt.title('Scaled Up Image')
+scale_variations_path = os.path.join(plot_path, '03_05_scale_variations.png')
+plt.savefig(scale_variations_path)
+print(f'Scale variations plot saved to {scale_variations_path}')
+plt.show()  # Show the plot
+plt.close()  # Close the figure after showing it
+
+# 4. Dealing with Class Imbalance
+# Show class distribution and techniques to address imbalance.
+
+class_counts = np.sum(y_train, axis=0)
+plt.bar(labels, class_counts)
+plt.title('Class Distribution')
+plt.xlabel('Class')
+plt.ylabel('Count')
+class_distribution_path = os.path.join(plot_path, '03_05_class_distribution.png')
+plt.savefig(class_distribution_path)
+print(f'Class distribution plot saved to {class_distribution_path}')
+plt.show()  # Show the plot
+plt.close()  # Close the figure after showing it
+
+# Techniques to handle class imbalance include oversampling, undersampling, and using class weights during training.
+
+# 5. Inter-class Similarity
+# Illustrate how similar classes can be confused by the model.
+
+def display_similar_images(images, labels, class_name_1, class_name_2):
+    class_indices_1 = [i for i, label in enumerate(labels) if label == class_name_1]
+    class_indices_2 = [i for i, label in enumerate(labels) if label == class_name_2]
+
+    plt.figure(figsize=(10, 5))
+    for i in range(5):
+        plt.subplot(2, 5, i+1)
+        plt.imshow(images[class_indices_1[i]])
+        plt.title('Cat' if class_name_1 == 3 else 'Dog')
+        plt.subplot(2, 5, i+6)
+        plt.imshow(images[class_indices_2[i]])
+        plt.title('Cat' if class_name_2 == 3 else 'Dog')
+    plt.suptitle('Similarity between Cat and Dog Images')
+    similar_images_path = os.path.join(plot_path, '03_05_similar_images.png')
+    plt.savefig(similar_images_path)
+    print(f'Similar images plot saved to {similar_images_path}')
+    plt.show()  # Show the plot
+    plt.close()  # Close the figure after showing it
+
+# Example: Cat and Dog images
+display_similar_images(X_train, np.argmax(y_train, axis=1), 3, 5)

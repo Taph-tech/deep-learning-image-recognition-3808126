@@ -203,3 +203,24 @@ display_similar_images(X_train, np.argmax(y_train, axis=1), 3, 5)
 
 # 6. Dealing with Noise in Images
 # Simulate noisy environments by adding random noise to the images.
+
+def add_noise_1(image, noise_factor=0.1):
+    noisy_image = image + noise_factor * np.random.normal(loc=0.0, scale=1.0, size=image.shape)
+    return np.clip(noisy_image, 0, 1)
+    
+
+
+def add_noise(image, noise_factor=0.1): # If no value is given for noise_factor, it will default to 0.1
+    noisy_image = image + noise_factor * np.random.rand(*image.shape)
+    noisy_image = np.clip(noisy_image, 0, 1)
+    return noisy_image
+
+noisy_image = add_noise_1(X_train[0])
+
+plt.imshow(noisy_image)
+plt.title('Noisy Image')
+noise_image_path = os.path.join(plot_path, '03_07_noisy_image1.png')
+plt.savefig(noise_image_path)
+print(f'Noisy image plot saved to {noise_image_path}')
+plt.show()  # Show the plot
+plt.close()  # Close the figure after showing it
